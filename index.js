@@ -6,9 +6,11 @@
 // ==/UserScript==
 
 (function async() {
-  const TARGET_EL_SELECTOR = '.community-points-summary';
-  const REWARD_BTN_SELECTOR = '[aria-label="Odbierz bonus"]';
-  const STREAMER_NAME_SELECTOR = 'a > h1.tw-title';
+  const TARGET_EL_SELECTOR =
+    "[data-test-selector='community-points-summary'] > div + div > div.tw-transition";
+  const REWARD_BTN_SELECTOR = "button";
+  const STREAMER_NAME_SELECTOR = ".channel-info-content a > h1";
+  const rewardLogs = [];
 
   const init = async () => {
     let rewardBtnEl = null;
@@ -16,10 +18,9 @@
     const DOMElements = await new Promise((resolve) => {
       const setIntervalId = setInterval(() => {
         const streamerNameEl = document.querySelector(STREAMER_NAME_SELECTOR);
-        const targetEl = document.querySelector(TARGET_EL_SELECTOR);
-
+        const [targetEl] = document.querySelectorAll(TARGET_EL_SELECTOR);
         if (targetEl && streamerNameEl) {
-          rewardBtnEl = document.querySelector(REWARD_BTN_SELECTOR);
+          rewardBtnEl = targetEl.querySelector(REWARD_BTN_SELECTOR);
           clearInterval(setIntervalId);
           resolve({ targetEl, streamerNameEl });
         }
@@ -31,15 +32,21 @@
         const { textContent: streamName } = DOMElements.streamerNameEl;
 
         rewardBtnElement.click();
-        window.console.info(`%c Got reward: ${new Date().toLocaleTimeString()} from ${streamName}`, 'background: #B7E1CD; color: #000; font-size: 20px');
+        const date = new Date().toLocaleTimeString();
+        rewardLogs.push(date);
+        window.console.clear();
+        window.console.info(
+          `%c Got reward: ${date} from ${streamName}`,
+          "background: #B7E1CD; color: #000; font-size: 20px"
+        );
+        window.console.info("Reward logs:", rewardLogs);
       }
     };
 
     const rewardObserverCallback = (mutations) => {
       mutations.forEach((mutation) => {
         if (mutation.addedNodes.length) {
-          rewardBtnEl = document.querySelector(REWARD_BTN_SELECTOR);
-
+          rewardBtnEl = mutation.target.querySelector(REWARD_BTN_SELECTOR);
           getReward(rewardBtnEl);
         }
       });
@@ -47,7 +54,7 @@
 
     const streamObserverCallback = (mutations, ...observers) => {
       mutations.forEach((mutation) => {
-        if (mutation.type === 'characterData') {
+        if (mutation.type === "characterData") {
           observers.forEach((observer) => observer.disconnect());
           init();
         }
@@ -69,4 +76,4 @@
   };
 
   init();
-}());
+})();
