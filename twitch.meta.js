@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitch Reward Autoclicker
 // @namespace    https://github.com/lukasz-brzozko/Twitch-Reward-Autoclicker
-// @version      0.2.1
+// @version      0.2.2
 // @description  Twitch Reward Autoclicker
 // @author       Łukasz Brzózko
 // @match      https://www.twitch.tv/*

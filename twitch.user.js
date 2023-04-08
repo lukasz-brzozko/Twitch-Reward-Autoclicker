@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitch Reward Autoclicker
 // @namespace    https://github.com/lukasz-brzozko/Twitch-Reward-Autoclicker
-// @version      0.2.1
+// @version      0.2.2
 // @description  Twitch Reward Autoclicker
 // @author       Łukasz Brzózko
 // @match        https://www.twitch.tv/*
@@ -21,6 +21,8 @@
     error: "Reward button container was not found.",
   };
   const rewardLogs = [];
+
+  let prevDocumentTitle = document.title;
 
   const init = async () => {
     let rewardBtnEl = null;
@@ -79,6 +81,9 @@
 
     const documentTitleObserverCallback = (mutations, ...observers) => {
       mutations.forEach((mutation) => {
+        if (document.title === prevDocumentTitle) return;
+        prevDocumentTitle = document.title;
+
         observers.forEach((observer) => observer.disconnect());
         init();
       });
